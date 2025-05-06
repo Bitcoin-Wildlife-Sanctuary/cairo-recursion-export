@@ -1,0 +1,13 @@
+[package]
+name = "cairo-recursion-evaluator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+stwo-prover.workspace = true
+num-traits.workspace = true
+cairo-recursion-gvn = { path = "../gvn" }
+
+[dev-dependencies]
+cairo-air.workspace = true
+rand.workspace = true

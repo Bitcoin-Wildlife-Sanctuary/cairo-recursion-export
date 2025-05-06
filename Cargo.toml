@@ -1,0 +1,9 @@
+[workspace]
+members = ["gvn", "evaluator"]
+resolver = "2"
+
+[workspace.dependencies]
+stwo-prover = { git = "https://github.com/starkware-libs/stwo/", rev = "61d1f6b" }
+cairo-air = { git = "https://github.com/Eikix/stwo-cairo/", branch = "feat/no_std_hashmap" }
+num-traits = "0.2.19"
+rand = { version = "0.8.5", default-features = false, features = ["small_rng"] }
