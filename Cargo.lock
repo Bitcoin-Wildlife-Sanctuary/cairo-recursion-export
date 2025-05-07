@@ -1538,7 +1538,7 @@ dependencies = [
 [[package]]
 name = "stwo-prover"
 version = "0.1.1"
-source = "git+https://github.com/starkware-libs/stwo/?rev=61d1f6b#61d1f6bf6d2913e6951b837526c2ce1f7f661414"
+source = "git+https://github.com/Bitcoin-Wildlife-Sanctuary/stwo-for-cairo-export#33ab78dc635ccb33563f62b10948f44ce3ebc6e2"
 dependencies = [
  "blake2",
  "blake3",

@@ -8,15 +8,15 @@ use stwo_prover::core::fields::qm31::SecureField;
 use stwo_prover::core::fields::FieldExpOps;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-pub struct ValueNumber(u32);
+pub struct ValueNumber(pub u32);
 
 #[derive(Hash, Eq, PartialEq, Clone)]
 pub enum ValueNumberContent {
     Col(ColumnExpr),
-    Param(String),
+    ParamBase(String),
+    ParamExt(String),
     ConstBase(BaseField),
     ConstExt(SecureField),
-    SecureCol([ValueNumber; 4]),
     Add(ValueNumber, ValueNumber),
     Mul(ValueNumber, ValueNumber),
     Neg(ValueNumber),
