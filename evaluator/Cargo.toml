@@ -7,6 +7,7 @@ edition = "2021"
 stwo-prover.workspace = true
 num-traits.workspace = true
 cairo-recursion-gvn = { path = "../gvn" }
+serde.workspace = true
 
 [dev-dependencies]
 cairo-air.workspace = true

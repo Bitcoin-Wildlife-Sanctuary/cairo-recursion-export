@@ -358,6 +358,7 @@ dependencies = [
  "cairo-recursion-gvn",
  "num-traits",
  "rand 0.8.5",
+ "serde",
  "stwo-prover",
 ]
 
@@ -365,7 +366,9 @@ dependencies = [
 name = "cairo-recursion-gvn"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "num-traits",
+ "serde",
  "stwo-prover",
 ]
 

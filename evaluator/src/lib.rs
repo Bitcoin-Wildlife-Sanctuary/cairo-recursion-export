@@ -2,10 +2,10 @@
 
 use cairo_recursion_gvn::{ValueNumber, ValueNumberContent, GVN_SYSTEM};
 use num_traits::Zero;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::Mul;
 use stwo_prover::constraint_framework::expr::assignment::ExprVarAssignment;
-use stwo_prover::constraint_framework::expr::ColumnExpr;
 use stwo_prover::constraint_framework::{
     EvalAtRow, Relation, RelationEntry, INTERACTION_TRACE_IDX,
 };
@@ -97,7 +97,7 @@ impl EvalAtRow for ValueNumberEvaluator {
         offsets: [isize; N],
     ) -> [Self::F; N] {
         let res = std::array::from_fn(|i| {
-            let col = ColumnExpr::from((interaction, self.cur_var_index, offsets[i]));
+            let col = (interaction, self.cur_var_index, offsets[i]);
             ValueNumberContent::Col(col).get_id()
         });
         self.cur_var_index += 1;
@@ -205,19 +205,16 @@ impl EvalAtRow for ValueNumberEvaluator {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ValueNumberAssignment {
-    pub col_map: HashMap<ColumnExpr, BaseField>,
+    pub col_map: HashMap<(usize, usize, isize), BaseField>,
     pub param_base_map: HashMap<String, BaseField>,
     pub param_ext_map: HashMap<String, SecureField>,
 }
 
 impl From<&ExprVarAssignment> for ValueNumberAssignment {
     fn from(assign: &ExprVarAssignment) -> Self {
-        let col_map = assign
-            .0
-            .iter()
-            .map(|(k, v)| (ColumnExpr::from(*k), *v))
-            .collect();
+        let col_map = assign.0.iter().map(|(k, v)| (k.clone(), *v)).collect();
 
         let param_base_map = assign.1.iter().map(|(k, v)| (k.clone(), *v)).collect();
 

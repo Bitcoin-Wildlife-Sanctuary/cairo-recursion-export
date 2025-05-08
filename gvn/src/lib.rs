@@ -1,18 +1,18 @@
 use num_traits::{One, Zero};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::sync::{LazyLock, Mutex};
-use stwo_prover::constraint_framework::expr::ColumnExpr;
 use stwo_prover::core::fields::m31::BaseField;
 use stwo_prover::core::fields::qm31::SecureField;
 use stwo_prover::core::fields::FieldExpOps;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, Serialize, Deserialize)]
 pub struct ValueNumber(pub u32);
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
 pub enum ValueNumberContent {
-    Col(ColumnExpr),
+    Col((usize, usize, isize)),
     ParamBase(String),
     ParamExt(String),
     ConstBase(BaseField),
@@ -23,7 +23,7 @@ pub enum ValueNumberContent {
     Inv(ValueNumber),
 }
 
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct GVNSystem {
     pub next_id: u32,
     pub map: HashMap<ValueNumberContent, ValueNumber>,
