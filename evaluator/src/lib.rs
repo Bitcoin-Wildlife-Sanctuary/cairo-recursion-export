@@ -289,9 +289,11 @@ mod test {
     use crate::{ValueNumberAssignment, ValueNumberConstraint, ValueNumberEvaluator};
     use cairo_air::components::generic_opcode::{Claim, Eval};
     use cairo_air::relations;
+    use cairo_recursion_gvn::GVN_SYSTEM;
     use num_traits::Zero;
     use rand::prelude::SmallRng;
     use rand::{Rng, SeedableRng};
+    use std::ops::Deref;
     use stwo_prover::constraint_framework::expr::ExprEvaluator;
     use stwo_prover::constraint_framework::FrameworkEval;
     use stwo_prover::core::fields::qm31::QM31;
@@ -307,6 +309,9 @@ mod test {
             range_check_19_lookup_elements: relations::RangeCheck_19::dummy(),
             opcodes_lookup_elements: relations::Opcodes::dummy(),
         };
+
+        GVN_SYSTEM.lock().unwrap().lock();
+
         let evaluator = eval.evaluate(ValueNumberEvaluator::new());
 
         let expr_eval = eval.evaluate(ExprEvaluator::new());
@@ -331,5 +336,45 @@ mod test {
             sum,
             QM31::from_u32_unchecked(676299912, 1544525990, 1973677465, 1109885774)
         );
+
+        GVN_SYSTEM.lock().unwrap().unlock();
+    }
+
+    #[test]
+    fn test_log_size_equivalance() {
+        let eval_4 = Eval {
+            claim: Claim { log_size: 4 },
+            verify_instruction_lookup_elements: relations::VerifyInstruction::dummy(),
+            memory_address_to_id_lookup_elements: relations::MemoryAddressToId::dummy(),
+            memory_id_to_big_lookup_elements: relations::MemoryIdToBig::dummy(),
+            range_check_9_9_lookup_elements: relations::RangeCheck_9_9::dummy(),
+            range_check_19_lookup_elements: relations::RangeCheck_19::dummy(),
+            opcodes_lookup_elements: relations::Opcodes::dummy(),
+        };
+        let eval_10 = Eval {
+            claim: Claim { log_size: 10 },
+            verify_instruction_lookup_elements: relations::VerifyInstruction::dummy(),
+            memory_address_to_id_lookup_elements: relations::MemoryAddressToId::dummy(),
+            memory_id_to_big_lookup_elements: relations::MemoryIdToBig::dummy(),
+            range_check_9_9_lookup_elements: relations::RangeCheck_9_9::dummy(),
+            range_check_19_lookup_elements: relations::RangeCheck_19::dummy(),
+            opcodes_lookup_elements: relations::Opcodes::dummy(),
+        };
+
+        GVN_SYSTEM.lock().unwrap().lock();
+        let _ = eval_4.evaluate(ValueNumberEvaluator::new());
+        let aa =
+            bincode::serialize(&GVN_SYSTEM.lock().unwrap().map.iter().collect::<Vec<_>>()).unwrap();
+        let a = GVN_SYSTEM.lock().unwrap().map.clone();
+        GVN_SYSTEM.lock().unwrap().unlock();
+
+        GVN_SYSTEM.lock().unwrap().lock();
+        let _ = eval_10.evaluate(ValueNumberEvaluator::new());
+        let bb =
+            bincode::serialize(&GVN_SYSTEM.lock().unwrap().map.iter().collect::<Vec<_>>()).unwrap();
+        let b = GVN_SYSTEM.lock().unwrap().map.clone();
+        GVN_SYSTEM.lock().unwrap().unlock();
+
+        assert_eq!(a, b);
     }
 }

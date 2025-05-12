@@ -8,7 +8,9 @@ cairo-air = { git = "https://github.com/Eikix/stwo-cairo/", branch = "feat/no_st
 num-traits = "0.2.19"
 rand = { version = "0.8.5", default-features = false, features = ["small_rng"] }
 serde = { version = "1.0.219", features = ["derive"] }
-bincode = "2.0.1"
+bincode = "1.3.3"
+indexmap = "2.9.0"
+miniz_oxide = "0.8.8"
 
 [patch.'https://github.com/starkware-libs/stwo']
 stwo-prover = { git = "https://github.com/Bitcoin-Wildlife-Sanctuary/stwo-for-cairo-export" }

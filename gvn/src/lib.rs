@@ -2,7 +2,8 @@ use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use std::sync::{LazyLock, Mutex};
+use std::sync::{LazyLock, Mutex, RwLock};
+use indexmap::IndexMap;
 use stwo_prover::core::fields::m31::BaseField;
 use stwo_prover::core::fields::qm31::SecureField;
 use stwo_prover::core::fields::FieldExpOps;
@@ -10,7 +11,7 @@ use stwo_prover::core::fields::FieldExpOps;
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, Serialize, Deserialize)]
 pub struct ValueNumber(pub u32);
 
-#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]
 pub enum ValueNumberContent {
     Col((usize, usize, isize)),
     ParamBase(String),
@@ -23,10 +24,11 @@ pub enum ValueNumberContent {
     Inv(ValueNumber),
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Default)]
 pub struct GVNSystem {
+    pub lock: RwLock<bool>,
     pub next_id: u32,
-    pub map: HashMap<ValueNumberContent, ValueNumber>,
+    pub map: IndexMap<ValueNumberContent, ValueNumber>,
 }
 
 pub static GVN_SYSTEM: LazyLock<Mutex<GVNSystem>> = LazyLock::new(Default::default);
@@ -34,6 +36,7 @@ pub static GVN_SYSTEM: LazyLock<Mutex<GVNSystem>> = LazyLock::new(Default::defau
 impl ValueNumberContent {
     pub fn get_id(&self) -> ValueNumber {
         let mut cs = GVN_SYSTEM.lock().unwrap();
+        cs.assert_is_locked();
         let r = cs.map.get(self);
         if let Some(r) = r {
             *r
@@ -47,6 +50,7 @@ impl ValueNumberContent {
 
     pub fn exists(&self) -> bool {
         let cs = GVN_SYSTEM.lock().unwrap();
+        cs.assert_is_locked();
         cs.map.contains_key(self)
     }
 }
@@ -186,6 +190,26 @@ impl Sub<SecureField> for ValueNumber {
 }
 
 impl GVNSystem {
+    pub fn lock(&mut self) {
+        self.map.clear();
+        self.next_id = 0;
+        
+        let mut a = self.lock.write().unwrap();
+        assert!(!*a);
+        *a = true;
+    }
+
+    pub fn assert_is_locked(&self) {
+        let a = self.lock.read().unwrap();
+        assert_eq!(*a, true);
+    }
+
+    pub fn unlock(&mut self) {
+        let mut a = self.lock.write().unwrap();
+        assert!(*a);
+        *a = false;
+    }
+
     pub fn export(&self) -> HashMap<ValueNumber, ValueNumberContent> {
         self.map.iter().map(|(k, v)| (*v, k.clone())).collect()
     }

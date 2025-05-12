@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "adler2"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
+
+[[package]]
 name = "allocator-api2"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -191,6 +197,15 @@ dependencies = [
 
 [[package]]
 name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "bincode"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36eaf5d7b090263e8150820482d5d93cd964a81e4019913c972f4edcc6edb740"
@@ -354,8 +369,10 @@ dependencies = [
 name = "cairo-recursion-evaluator"
 version = "0.1.0"
 dependencies = [
+ "bincode 1.3.3",
  "cairo-air",
  "cairo-recursion-gvn",
+ "miniz_oxide",
  "num-traits",
  "rand 0.8.5",
  "serde",
@@ -366,7 +383,7 @@ dependencies = [
 name = "cairo-recursion-gvn"
 version = "0.1.0"
 dependencies = [
- "bincode",
+ "indexmap",
  "num-traits",
  "serde",
  "stwo-prover",
@@ -378,7 +395,7 @@ version = "2.0.1"
 source = "git+https://github.com/lambdaclass/cairo-vm?rev=9c44e1cef56c6ea557d6441e27ad3c756bbbe8a9#9c44e1cef56c6ea557d6441e27ad3c756bbbe8a9"
 dependencies = [
  "anyhow",
- "bincode",
+ "bincode 2.0.1",
  "bitvec",
  "generic-array",
  "hashbrown 0.15.3",
@@ -873,6 +890,15 @@ name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
+
+[[package]]
+name = "miniz_oxide"
+version = "0.8.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3be647b768db090acb35d5ec5db2b0e1f1de11133ca123b9eacf5137868f892a"
+dependencies = [
+ "adler2",
+]
 
 [[package]]
 name = "nom"
@@ -1487,7 +1513,7 @@ name = "stwo-cairo-adapter"
 version = "0.1.0"
 source = "git+https://github.com/Eikix/stwo-cairo/?branch=feat%2Fno_std_hashmap#27de5f5c673c9d9a334e0653bec1f4528a2b6ade"
 dependencies = [
- "bincode",
+ "bincode 2.0.1",
  "bytemuck",
  "cairo-lang-casm",
  "cairo-vm",
