@@ -1,9 +1,8 @@
+use indexmap::IndexMap;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::sync::{LazyLock, Mutex, RwLock};
-use indexmap::IndexMap;
 use stwo_prover::core::fields::m31::BaseField;
 use stwo_prover::core::fields::qm31::SecureField;
 use stwo_prover::core::fields::FieldExpOps;
@@ -193,7 +192,7 @@ impl GVNSystem {
     pub fn lock(&mut self) {
         self.map.clear();
         self.next_id = 0;
-        
+
         let mut a = self.lock.write().unwrap();
         assert!(!*a);
         *a = true;
@@ -210,7 +209,7 @@ impl GVNSystem {
         *a = false;
     }
 
-    pub fn export(&self) -> HashMap<ValueNumber, ValueNumberContent> {
+    pub fn export(&self) -> IndexMap<ValueNumber, ValueNumberContent> {
         self.map.iter().map(|(k, v)| (*v, k.clone())).collect()
     }
 }
