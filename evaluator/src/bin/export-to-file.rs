@@ -1,7 +1,8 @@
 use cairo_recursion_evaluator::mock_parameters::*;
-use cairo_recursion_evaluator::{ValueNumberAssignment, ValueNumberEvaluator};
+use cairo_recursion_evaluator::{
+    ValueNumberAssignment, ValueNumberAssignmentExport, ValueNumberEvaluator,
+};
 use cairo_recursion_gvn::{ValueNumber, ValueNumberContent, GVN_SYSTEM};
-use miniz_oxide::deflate::compress_to_vec;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -10,14 +11,19 @@ use stwo_prover::constraint_framework::FrameworkEval;
 
 #[derive(Serialize, Deserialize)]
 pub struct ExportedData {
-    pub map: Vec<(ValueNumberContent, ValueNumber)>,
-    pub assignment: ValueNumberAssignment,
+    pub map: Vec<(ValueNumber, ValueNumberContent)>,
+    pub assignment: ValueNumberAssignmentExport,
     pub constraints: Vec<ValueNumber>,
 }
 
 fn export<T: FrameworkEval>(name: &str, f: fn() -> T) {
     let mut file = BufWriter::new(
-        File::create(format!("{}/../data/{}", env!("CARGO_MANIFEST_DIR"), name)).unwrap(),
+        File::create(format!(
+            "{}/../data/{}.json",
+            env!("CARGO_MANIFEST_DIR"),
+            name
+        ))
+        .unwrap(),
     );
     let eval = f();
 
@@ -35,19 +41,15 @@ fn export<T: FrameworkEval>(name: &str, f: fn() -> T) {
         e.constraints.len(),
     );
 
+    let mut map = GVN_SYSTEM.lock().unwrap().export();
+    map.sort_keys();
+
     let data = ExportedData {
-        map: GVN_SYSTEM
-            .lock()
-            .unwrap()
-            .map
-            .iter()
-            .map(|(k, v)| (k.clone(), *v))
-            .collect::<Vec<_>>(),
-        assignment,
+        map: map.iter().map(|(k, v)| (*k, v.clone())).collect::<Vec<_>>(),
+        assignment: ValueNumberAssignmentExport::from(&assignment),
         constraints: e.constraints,
     };
-    file.write(&compress_to_vec(&bincode::serialize(&data).unwrap(), 6))
-        .unwrap();
+    serde_json::to_writer(&mut file, &data).unwrap();
     file.flush().unwrap();
     GVN_SYSTEM.lock().unwrap().unlock();
 }

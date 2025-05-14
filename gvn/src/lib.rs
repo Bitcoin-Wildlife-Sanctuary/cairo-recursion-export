@@ -7,7 +7,7 @@ use stwo_prover::core::fields::m31::BaseField;
 use stwo_prover::core::fields::qm31::SecureField;
 use stwo_prover::core::fields::FieldExpOps;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Eq, Ord, PartialOrd, PartialEq, Debug, Hash, Serialize, Deserialize)]
 pub struct ValueNumber(pub u32);
 
 #[derive(Hash, Eq, PartialEq, Clone, Serialize, Deserialize, Debug)]

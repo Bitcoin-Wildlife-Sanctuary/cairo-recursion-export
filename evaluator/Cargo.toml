@@ -8,9 +8,8 @@ stwo-prover.workspace = true
 num-traits.workspace = true
 cairo-recursion-gvn = { path = "../gvn" }
 serde.workspace = true
-bincode.workspace = true
+serde_json.workspace = true
 cairo-air.workspace = true
-miniz_oxide.workspace = true
 indexmap.workspace = true
 
 [dev-dependencies]

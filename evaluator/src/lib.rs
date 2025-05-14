@@ -3,9 +3,9 @@
 pub mod mock_parameters;
 
 use cairo_recursion_gvn::{ValueNumber, ValueNumberContent, GVN_SYSTEM};
+use indexmap::IndexMap;
 use num_traits::Zero;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::ops::Mul;
 use stwo_prover::constraint_framework::expr::assignment::ExprVarAssignment;
 use stwo_prover::constraint_framework::{
@@ -207,11 +207,10 @@ impl EvalAtRow for ValueNumberEvaluator {
     }
 }
 
-#[derive(Serialize, Deserialize)]
 pub struct ValueNumberAssignment {
-    pub col_map: HashMap<(usize, usize, isize), BaseField>,
-    pub param_base_map: HashMap<String, BaseField>,
-    pub param_ext_map: HashMap<String, SecureField>,
+    pub col_map: IndexMap<(usize, usize, isize), BaseField>,
+    pub param_base_map: IndexMap<String, BaseField>,
+    pub param_ext_map: IndexMap<String, SecureField>,
 }
 
 impl From<&ExprVarAssignment> for ValueNumberAssignment {
@@ -226,6 +225,45 @@ impl From<&ExprVarAssignment> for ValueNumberAssignment {
             col_map,
             param_base_map,
             param_ext_map,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ValueNumberAssignmentExport {
+    pub col_map: Vec<((usize, usize, isize), BaseField)>,
+    pub param_base_map: Vec<(String, BaseField)>,
+    pub param_ext_map: Vec<(String, SecureField)>,
+}
+
+impl From<&ValueNumberAssignment> for ValueNumberAssignmentExport {
+    fn from(assign: &ValueNumberAssignment) -> Self {
+        let mut col_map = assign.col_map.clone();
+        col_map.sort_keys();
+
+        let mut param_base_map = assign.param_base_map.clone();
+        param_base_map.sort_keys();
+
+        let mut param_ext_map = assign.param_ext_map.clone();
+        param_ext_map.sort_keys();
+
+        Self {
+            col_map: col_map.iter().map(|(k, v)| (k.clone(), *v)).collect(),
+            param_base_map: param_base_map
+                .iter()
+                .map(|(k, v)| (k.clone(), *v))
+                .collect(),
+            param_ext_map: param_ext_map.iter().map(|(k, v)| (k.clone(), *v)).collect(),
+        }
+    }
+}
+
+impl From<&ValueNumberAssignmentExport> for ValueNumberAssignment {
+    fn from(assign: &ValueNumberAssignmentExport) -> Self {
+        Self {
+            col_map: IndexMap::from_iter(assign.col_map.iter().cloned()),
+            param_base_map: IndexMap::from_iter(assign.param_base_map.iter().cloned()),
+            param_ext_map: IndexMap::from_iter(assign.param_ext_map.iter().cloned()),
         }
     }
 }
