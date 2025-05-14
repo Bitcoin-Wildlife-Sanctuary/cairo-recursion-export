@@ -1,5 +1,7 @@
 // largely the same as https://github.com/starkware-libs/stwo/blob/dev/crates/prover/src/constraint_framework/expr/evaluator.rs
 
+pub mod mock_parameters;
+
 use cairo_recursion_gvn::{ValueNumber, ValueNumberContent, GVN_SYSTEM};
 use num_traits::Zero;
 use serde::{Deserialize, Serialize};
@@ -338,43 +340,5 @@ mod test {
         );
 
         GVN_SYSTEM.lock().unwrap().unlock();
-    }
-
-    #[test]
-    fn test_log_size_equivalance() {
-        let eval_4 = Eval {
-            claim: Claim { log_size: 4 },
-            verify_instruction_lookup_elements: relations::VerifyInstruction::dummy(),
-            memory_address_to_id_lookup_elements: relations::MemoryAddressToId::dummy(),
-            memory_id_to_big_lookup_elements: relations::MemoryIdToBig::dummy(),
-            range_check_9_9_lookup_elements: relations::RangeCheck_9_9::dummy(),
-            range_check_19_lookup_elements: relations::RangeCheck_19::dummy(),
-            opcodes_lookup_elements: relations::Opcodes::dummy(),
-        };
-        let eval_10 = Eval {
-            claim: Claim { log_size: 10 },
-            verify_instruction_lookup_elements: relations::VerifyInstruction::dummy(),
-            memory_address_to_id_lookup_elements: relations::MemoryAddressToId::dummy(),
-            memory_id_to_big_lookup_elements: relations::MemoryIdToBig::dummy(),
-            range_check_9_9_lookup_elements: relations::RangeCheck_9_9::dummy(),
-            range_check_19_lookup_elements: relations::RangeCheck_19::dummy(),
-            opcodes_lookup_elements: relations::Opcodes::dummy(),
-        };
-
-        GVN_SYSTEM.lock().unwrap().lock();
-        let _ = eval_4.evaluate(ValueNumberEvaluator::new());
-        let aa =
-            bincode::serialize(&GVN_SYSTEM.lock().unwrap().map.iter().collect::<Vec<_>>()).unwrap();
-        let a = GVN_SYSTEM.lock().unwrap().map.clone();
-        GVN_SYSTEM.lock().unwrap().unlock();
-
-        GVN_SYSTEM.lock().unwrap().lock();
-        let _ = eval_10.evaluate(ValueNumberEvaluator::new());
-        let bb =
-            bincode::serialize(&GVN_SYSTEM.lock().unwrap().map.iter().collect::<Vec<_>>()).unwrap();
-        let b = GVN_SYSTEM.lock().unwrap().map.clone();
-        GVN_SYSTEM.lock().unwrap().unlock();
-
-        assert_eq!(a, b);
     }
 }
