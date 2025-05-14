@@ -295,7 +295,6 @@ mod test {
     use num_traits::Zero;
     use rand::prelude::SmallRng;
     use rand::{Rng, SeedableRng};
-    use std::ops::Deref;
     use stwo_prover::constraint_framework::expr::ExprEvaluator;
     use stwo_prover::constraint_framework::FrameworkEval;
     use stwo_prover::core::fields::qm31::QM31;
