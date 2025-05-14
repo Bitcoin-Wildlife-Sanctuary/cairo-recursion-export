@@ -49,7 +49,7 @@ fn export<T: FrameworkEval>(name: &str, f: fn() -> T) {
         assignment: ValueNumberAssignmentExport::from(&assignment),
         constraints: e.constraints,
     };
-    serde_json::to_writer(&mut file, &data).unwrap();
+    serde_json::to_writer_pretty(&mut file, &data).unwrap();
     file.flush().unwrap();
     GVN_SYSTEM.lock().unwrap().unlock();
 }
